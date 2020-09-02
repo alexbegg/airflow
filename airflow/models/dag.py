@@ -791,6 +791,33 @@ class DAG(BaseDag, LoggingMixin):
         return self.get_latest_execution_date()
 
     @property
+    def schedulable_at(self):
+        """
+        Returns the earliest time at which the DAG will next be eligible for
+        execution by the scheduler
+        """
+        from airflow.jobs.scheduler_job import DagFileProcessor
+        dag_file_processor = DagFileProcessor(dag_ids=[self.dag_id], log=self.log)
+        next_run_date = dag_file_processor.create_dag_run(self, dry_run=True)
+        if next_run_date:
+            period_end = self.following_schedule(next_run_date)
+            return period_end
+        else:
+            return "next_run_date: " + next_run_date
+
+    @property
+    def scheduled_in(self):
+        """
+        Returns a human readable duration before the next schedulable time
+        of the DAG
+        """
+        import pendulum
+        diff = self.schedulable_at - pendulum.now()
+        if diff.in_seconds() <= 0:
+            return "overdue"
+        return diff
+
+    @property
     def subdags(self):
         """
         Returns a list of the subdag objects associated to this DAG

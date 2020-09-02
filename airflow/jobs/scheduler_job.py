@@ -540,6 +540,7 @@ class DagFileProcessor(LoggingMixin):
         dag: DAG,
         dag_runs: Optional[List[DagRun]] = None,
         session: Session = None,
+        dry_run=False,
     ) -> Optional[DagRun]:
         """
         This method checks whether a new DagRun needs to be created
@@ -667,6 +668,11 @@ class DagFileProcessor(LoggingMixin):
         min_task_end_date = min([t.end_date for t in dag.tasks if t.end_date], default=None)
         if next_run_date and min_task_end_date and next_run_date > min_task_end_date:
             return None
+
+        # Don't really schedule the job, we are interested in its next run date
+        # as calculated by the scheduler
+        if dry_run is True:
+            return next_run_date
 
         if next_run_date and period_end and period_end <= timezone.utcnow():
             next_run = dag.create_dagrun(

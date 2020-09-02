@@ -129,6 +129,12 @@
             <td>
               <a class="label label-default schedule" href="{{ url_for('DagRunModelView.list') }}?_flt_3_dag_id={{ dag.dag_id }}">
                 {{ dag.schedule_interval }}
+              </a><br>
+              <a class="label label-default schedule" href="{{ url_for('DagRunModelView.list') }}?_flt_3_dag_id={{ dag.dag_id }}">
+                {{ dag.schedulable_at }}
+              </a><br>
+              <a class="label label-default schedule" href="{{ url_for('DagRunModelView.list') }}?_flt_3_dag_id={{ dag.dag_id }}">
+                {{ dag.scheduled_in }}
               </a>
             </td>
 
